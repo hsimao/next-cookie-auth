@@ -1,56 +1,65 @@
 import Link from 'next/link'
 
-const Layout = ({ title, children }) => (
-  <div className="root">
-    <nav className="navbar">
-      <span>
-        Welcome, <strong>Guest</strong>
-      </span>
-      <div>
-        <Link href="/">
-          <a>Home</a>
-        </Link>
-        <Link href="/profile">
-          <a>Profile</a>
-        </Link>
-      </div>
-      <button>Logout</button>
-      <Link href="/login">
-        <a>Login</a>
-      </Link>
-    </nav>
+const Layout = ({ title, children, auth }) => {
+  const { user = {} } = auth || {}
 
-    <h1>{title}</h1>
-    {children}
+  return (
+    <div className="root">
+      <nav className="navbar">
+        <span>
+          Welcome, <strong>{user.name || 'Guest'}</strong>
+        </span>
+        <div>
+          <Link href="/">
+            <a>Home</a>
+          </Link>
+          {user.email ? (
+            <>
+              <Link href="/profile">
+                <a>Profile</a>
+              </Link>
+              <button>Logout</button>
+            </>
+          ) : (
+            <Link href="/login">
+              <a>Login</a>
+            </Link>
+          )}
+        </div>
+      </nav>
 
-    <style jsx>{`
-      .root {
-        display: flex;
-        align-items: center;
-        justify-centent: center;
-        flex-direction: column;
-      }
+      <h1>{title}</h1>
+      {children}
 
-      .navbar {
-        width: 100%;
-        display: flex;
-        justify-content: space-around;
-      }
+      <style jsx>{`
+        .root {
+          display: flex;
+          align-items: center;
+          justify-centent: center;
+          flex-direction: column;
+        }
 
-      a {
-        margin-right: 0.5em;
-      }
+        .navbar {
+          width: 100%;
+          display: flex;
+          justify-content: space-around;
+        }
 
-      button {
-        text-decoration: underline;
-        padding: 0;
-        font: inherit;
-        cursor: pointer;
-        border-style: none;
-        color: rgb(0, 0, 238);
-      }
-    `}</style>
-  </div>
-)
+        a {
+          margin-right: 0.5em;
+        }
+
+        button {
+          text-decoration: underline;
+          padding: 0;
+          font: inherit;
+          cursor: pointer;
+          border-style: none;
+          color: rgb(0, 0, 238);
+        }
+      `}</style>
+    </div>
+  )
+}
 
 export default Layout
