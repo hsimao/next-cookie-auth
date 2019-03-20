@@ -22,4 +22,4 @@ export default class Profile extends React.Component {
 }
 
 // 進到該頁面時使用 authInitialProps 方法來重新將用戶資料傳送到 props 內
-Profile.getInitialProps = authInitialProps()
+Profile.getInitialProps = authInitialProps(true)
