@@ -5,6 +5,8 @@ class LoginForm extends React.Component {
   state = {
     email: 'Sincere@april.biz',
     password: 'hildegard.org',
+    error: '',
+    isLoading: false,
   }
 
   handleChange = event => {
@@ -15,15 +17,23 @@ class LoginForm extends React.Component {
 
   handleSubmit = event => {
     event.preventDefault()
-
     const { email, password } = this.state
-    loginUser(email, password).then(() => {
-      Router.push('/profile')
-    })
+    this.setState({ error: '', isLoading: true })
+    loginUser(email, password)
+      .then(() => {
+        Router.push('/profile')
+      })
+      .catch(this.showError)
+  }
+
+  showError = err => {
+    console.error(err)
+    const error = (err.response && err.response.data) || err.message
+    this.setState({ error, isLoading: false })
   }
 
   render() {
-    const { email, password } = this.state
+    const { email, password, error, isLoading } = this.state
 
     return (
       <form onSubmit={this.handleSubmit}>
@@ -33,7 +43,10 @@ class LoginForm extends React.Component {
         <div>
           <input type="password" name="password" value={password} placeholder="password" onChange={this.handleChange} />
         </div>
-        <button type="submit">送出</button>
+        <button disabled={isLoading} type="submit">
+          {isLoading ? '發送中...' : '送出'}
+        </button>
+        {error && <div>{error}</div>}
       </form>
     )
   }
