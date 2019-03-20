@@ -44,6 +44,7 @@ app.prepare().then(() => {
       return res.status(403).send('錯誤的email或password')
     }
 
+    // 將取得的用戶資料加密存入 cookie
     const userData = {
       name: user.name,
       email: user.email,
@@ -51,6 +52,20 @@ app.prepare().then(() => {
     }
     res.cookie('token', userData, COOKIE_OPTIONS)
     res.json(userData)
+  })
+
+  server.get('/api/profile', async (req, res) => {
+    // 取得解析完 cookie 的用戶資料
+    const { signedCookies = {} } = req
+    const { token } = signedCookies
+
+    // 如果有 token, 且有 email, 重新呼叫 api 獲取相同 email 的最新用戶資料
+    if (token && token.email) {
+      const { data } = await axios.get('https://jsonplaceholder.typicode.com/users')
+      const userProfile = data.find(user => user.email === token.email)
+      return res.json({ user: userProfile })
+    }
+    res.sendStatus(404)
   })
 
   server.get('*', (req, res) => {
