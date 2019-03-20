@@ -1,6 +1,7 @@
 const next = require('next')
 const express = require('express')
 const axios = require('axios')
+const cookieParser = require('cookie-parser')
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = process.env.PORT || 3000
@@ -8,6 +9,15 @@ const app = next({ dev })
 const handle = app.getRequestHandler()
 
 const AUTH_USER_TYPE = 'authenticated'
+
+// cookie 安全設定
+const COOKIE_SECRET = 'mars1234'
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: !dev, // https 開發環境中不會限定要用 https
+  signed: true,
+}
+
 const authenticate = async (email, password) => {
   const { data } = await axios.get('https://jsonplaceholder.typicode.com/users')
 
@@ -23,6 +33,7 @@ app.prepare().then(() => {
 
   // express 4.0.0 以上內建解析 json 方法
   server.use(express.json())
+  server.use(cookieParser(COOKIE_SECRET))
 
   server.post('/api/login', async (req, res) => {
     const { email, password } = req.body
@@ -38,6 +49,7 @@ app.prepare().then(() => {
       email: user.email,
       type: AUTH_USER_TYPE,
     }
+    res.cookie('token', userData, COOKIE_OPTIONS)
     res.json(userData)
   })
 
